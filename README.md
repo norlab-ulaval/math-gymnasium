@@ -14,8 +14,7 @@
 <br>
 
 [//]: # ( ==== Title ================================================= ) 
-[//]: # (TODO: change the title)
-# _math-gymnasium_
+# _Math Gymnasium (MG)_
 
 [//]: # ( ==== Hyperlink ============================================= ) 
 <sup>
@@ -29,15 +28,7 @@
 <br>
 
 [//]: # ( ==== Description =========================================== ) 
-[//]: # (TODO: Change the description)
-**Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in egestas magna, vel molestie
-mauris.**
-<br>
-<br>
-Sed vehicula felis at felis posuere efficitur quis sit amet arcu. Proin egestas urna vulputate
-lorem pharetra, in posuere ipsum posuere. Fusce condimentum mi et urna aliquam, non euismod quam
-fermentum.
-
+**Mathematic function formulated as a Gymnasium environment. This is a no action environment meant for evaluating model-based RL motion dynamic model learning quality.**
 <br>
 
 [//]: # ( ==== Badges ================================================ ) 
@@ -77,17 +68,3 @@ Maintainer <a href="https://github.com/RedLeader962">RedLeader962</a>
 ```shell
 git clone --recurse-submodule https://github.com/norlab-ulaval/math-gymnasium.git
 ```
-
-#### Execute configuration steps from [template-norlab-project/README.md](https://github.com/norlab-ulaval/template-norlab-project/tree/main/README.md)
-- [ ] Step 1 › Generate the new repository
-- [ ] Step 2 › Configure the _GitHub_ repository settings
-- [ ] Step 3 › Release automation: enable semantic versioning tools
-- [ ] Step 4 › Make it your own
-
-### My game changer project
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in egestas magna, vel molestie mauris. Sed vehicula felis at felis posuere efficitur quis sit amet arcu. Proin egestas urna vulputate lorem pharetra, in posuere ipsum posuere. Fusce condimentum mi et urna aliquam, non euismod quam fermentum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in egestas magna, vel molestie mauris. Sed vehicula felis at felis posuere efficitur quis sit amet arcu. Proin egestas urna vulputate lorem pharetra, in posuere ipsum posuere. Fusce condimentum mi et urna aliquam, non euismod quam fermentum. 
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in egestas magna, vel molestie mauris. Sed vehicula felis at felis posuere efficitur quis sit amet arcu. Proin egestas urna vulputate lorem pharetra, in posuere ipsum posuere. Fusce condimentum mi et urna aliquam, non euismod quam fermentum.
-
-

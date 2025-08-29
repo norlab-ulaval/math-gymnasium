@@ -4,7 +4,7 @@ TODO_REPO_NAME guidelines and instructions
 
 ## Repository Description
 
-TODO: Add repository description
+Mathematic function formulated as a Gymnasium environment. This is a no action environment meant for evaluating model-based RL motion dynamic model learning quality.
 
 ## Prime directive:
 
@@ -26,8 +26,6 @@ Always comply with guidelines and instructions.
 - `artifact/` contains project artifact such as experimental log, plot and rosbag.
 - `utilities/` contains external libraries.
 
-TODO: add missing directory
-
 ## Repository Terminology
 
-TODO: add new terminology to limit AI agent confusion. 
+- MG: Acronym for _Math Gymnasium_ i.e., the current repository 
