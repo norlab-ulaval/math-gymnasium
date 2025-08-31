@@ -66,5 +66,5 @@ Maintainer <a href="https://github.com/RedLeader962">RedLeader962</a>
 ### Clone repository
 
 ```shell
-git clone --recurse-submodule https://github.com/norlab-ulaval/math-gymnasium.git
+git clone https://github.com/norlab-ulaval/math-gymnasium.git
 ```
