@@ -24,7 +24,8 @@ Always comply with _A2G Framework Guidelines_, _Repository Guidelines_ and _AI o
   `.junie/ai_agent_guidelines/README.md`.
 - `src/` contains repository source code.
 - `tests/` contains tests files.
-- `artifact/` contains project artifact such as experimental log, plot and rosbag.
+- `artifact/` contains runtime produced data such as experimental log, plot and trained model.
+- `data/` contains input data such as _test data_, _demo data_ or _experimental data_.
 - `utilities/` contains external libraries.
 
 ## Repository Terminology
