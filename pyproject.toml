@@ -31,7 +31,8 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "trajectory-container-tools",
+#    "trajectory-container-tools",
+    "trajectory-container-tools @ git+https://github.com/norlab-ulaval/trajectory-container-tools.git",
     "numpy",
     "gymnasium",
 ]
