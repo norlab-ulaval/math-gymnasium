@@ -15,8 +15,8 @@ data/shared_data/*
 !data/**/README.md
 
 # ====Dockerized-NorLab(recommended)===============================================================
-**/slurm_jobs/*.out
-**/slurm_jobs/out/*.out
+#**/slurm_jobs/*.out
+#**/slurm_jobs/out/*.out
 
 # ====Repository===================================================================================
 

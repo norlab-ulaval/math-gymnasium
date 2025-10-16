@@ -27,8 +27,8 @@ data/external_data/*
 data/shared_data/*
 
 # ====Dockerized-NorLab(recommended)===============================================================
-**/slurm_jobs/*.out
-**/slurm_jobs/out/*.out
+#**/slurm_jobs/*.out
+#**/slurm_jobs/out/*.out
 
 # ====General======================================================================================
 # ....Repository related...........................................................................
