@@ -68,8 +68,8 @@ class MathContinuousGymnasium(gym.Env):
 
             >>> [
             >>>   {
-            >>>     'interval': [<start-index>, <end-index>]
-            >>>     'magnitude': <noise-standard-deviation>
+            >>>     'interval': [start_index, end_index],
+            >>>     'magnitude': noise_standard_deviation
             >>>   },
             >>>   ...
             >>> ]
@@ -77,8 +77,8 @@ class MathContinuousGymnasium(gym.Env):
         - Param `time_axis_cfg` argument must take the form:
 
             >>> {
-            >>>   'bound': [<start-index>, <end-index>]
-            >>>   'granularity': <time-space-array-size>
+            >>>   'bound': [start_index, end_index],
+            >>>   'granularity': time_space_array_size
             >>> }
 
         - Param `explorable_regions_cfg` argument must take the form:

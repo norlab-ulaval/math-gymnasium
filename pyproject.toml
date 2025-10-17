@@ -35,6 +35,7 @@ dependencies = [
     "trajectory-container-tools @ git+https://github.com/norlab-ulaval/trajectory-container-tools.git",
     "numpy",
     "gymnasium",
+    "omegaconf",
 ]
 
 [project.optional-dependencies]
