@@ -427,7 +427,7 @@ def _setup_1d_axis_prediction_subplot(
         + 2 * pred_std_3d[..., selected_dimension],
         color="b",
         alpha=0.2,
-        label="Epistemic uncertainty",
+        label="Uncertainty (ale + epi)",
     )
     axis.fill_between(
         time_space,

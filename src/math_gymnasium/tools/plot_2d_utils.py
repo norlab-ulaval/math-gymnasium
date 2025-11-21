@@ -122,7 +122,7 @@ def two_dimension_prediction_plot(
         y_pred + 2 * y_std,
         color="b",
         alpha=0.1,
-        label="Epistemic uncertainty",
+        label="Uncertainty (ale + epi)",
     )
     ax.fill_between(state_space_x, y_pred - 2 * y_std, y_pred, color="b", alpha=0.1)
     plt.legend(loc="lower right", bbox_to_anchor=(1, -0.18))
