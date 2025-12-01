@@ -7,6 +7,7 @@ import omegaconf
 import torch
 from matplotlib import pyplot as plt
 
+from math_gymnasium.tools.style import *
 from tools.dna_dev_tools.dn_pytest_tools import is_pytest_run
 from tools.plot_tools.style import AXIS_LABEL_STYLE
 
@@ -14,7 +15,6 @@ DIM_X = 0
 DIM_Y = 1
 DIM_Z = 2
 LEGEND_BBOX_TO_ANCHOR = (1.0, 0.99)
-
 
 def prep_arbitrary_dimension_observation_prediction_output_for_1D_plotting(
     selected_dimension: int,
@@ -57,18 +57,19 @@ def three_dimension_environment_space_plot(
     subplot_1d_interval: Optional[slice] = None,
     show_samples: bool = True,
     figsize: tuple = (20, 16),
+    figdpi: int = 50,
     show_explorable_space=True,
     extra_info_str: str = None,
     experiment_id: Optional[str] = None,
 ) -> Tuple[plt.Figure, plt.Axes, plt.Axes, plt.Axes, plt.Axes]:
     omegaconf.OmegaConf.set_readonly(cfg, True)
 
-    if not subplot_1d_interval:
+    if subplot_1d_interval is None:
         subplot_1d_interval = slice(0, time_space.size - 1)
     else:
         assert isinstance(subplot_1d_interval, slice)
 
-    fig: plt.Figure = plt.figure(figsize=figsize, dpi=50)  # default dpi=100
+    fig: plt.Figure = plt.figure(figsize=figsize, dpi=figdpi)  # default dpi=100
 
     gs = fig.add_gridspec(3, 8)
 
@@ -78,8 +79,10 @@ def three_dimension_environment_space_plot(
 
     ax_3d.plot(
         *state_space_3d[subplot_1d_interval, :].T,
-        color="r",
-        lw=0.6,
+        color=COLOR_GROUND_TRUTH,
+        alpha=COLOR_LINE_3D_ALPHA,
+        lw=THREE_DIM_LW,
+        zorder=4,  # Put in front of predictions
     )
 
     # Quick-hack to prevent 3D aspect ratio skewing
@@ -179,17 +182,31 @@ def three_dimension_environment_space_plot(
         loc="upper right",
         bbox_to_anchor=LEGEND_BBOX_TO_ANCHOR,
         bbox_transform=fig.transFigure,
+        numpoints=3,
+        markerscale=11.0,
     )
 
     # .... Show experiment relevant information ...................................................
 
     if not is_pytest_run():
+
+        if cfg.environment.obs_are_dt_derivatives:
+            obs_str = "velocity, "
+        else:
+            obs_str = "pose, "
+
+        if cfg.environment.obs_time_is_delta_time:
+            obs_str += "delta-time"
+        else:
+            obs_str += "timestep"
+
         info_str = (
             # f"Environment math function:\n"
             # f"  {state_space_label}\n"
             f"{state_space_label}\n"
             f"  Time space granularity: {cfg.environment.time_space.granularity}\n"
             f"  Explorable space idx: {cfg.environment.explorable_space}\n"
+            f"  Observations: ({obs_str})\n"
             f"{extra_info_str or ''}"
         )
         text_style = {
@@ -234,12 +251,12 @@ def _setup_1d_axis_subplot(
     axis.plot(
         time_space,
         state_space[..., selected_dimension],
-        color="r",
-        # ls="--",
+        color=COLOR_GROUND_TRUTH,
+        alpha=COLOR_GROUND_TRUTH_ALPHA,
         ls="-",
-        # linewidth=2,
         linewidth=1,
         label=label,
+        zorder=4,  # Put in front of predictions
     )
 
     if skip_label:
@@ -259,10 +276,11 @@ def _setup_1d_axis_subplot(
                 # state_space_with_noise_sdim[explorable_interval],
                 state_space_with_noise[explorable_interval, selected_dimension],
                 ".",
-                color="black",
-                markersize=1.9,
-                alpha=0.25,
+                color=COLOR_OBSERVATIONS,
+                markersize=MARKERSIZE_OBSERVATIONS,
+                alpha=COLOR_OBSERVATIONS_ALPHA,
                 label=show_sample_label_once,
+                zorder=4,  # Put in front of predictions
             )
         show_sample_label_once = ""
 
@@ -299,10 +317,16 @@ def three_dimension_prediction_plot(
     state_space_3d_target: np.ndarray,
     pred_mean_3d: np.ndarray,
     pred_std_3d: np.ndarray,
+    pred_epi_std_3d: np.ndarray,
     title: str,
     state_space_label: str,
+    show_ale_uncertainty: bool = True,
+    ale_uncertainty_scaling: float = ALE_UNCERTAINTY_SCALING_DEFAULT,
+    show_epi_uncertainty: bool = True,
+    epi_uncertainty_scaling: float = EPI_UNCERTAINTY_SCALING_DEFAULT,
     subplot_1d_interval: Optional[slice] = None,
     figsize: tuple = (20, 8),
+    figdpi: int = 50,
     extra_info_str: Optional[str] = None,
     experiment_id: Optional[str] = None,
 ) -> Tuple[plt.Figure, plt.Axes, plt.Axes, plt.Axes, plt.Axes]:
@@ -323,6 +347,7 @@ def three_dimension_prediction_plot(
         subplot_1d_interval=subplot_1d_interval,
         show_samples=False,
         figsize=figsize,
+        figdpi=figdpi,
         extra_info_str=extra_info_str,
         experiment_id=experiment_id,
     )
@@ -330,9 +355,10 @@ def three_dimension_prediction_plot(
     # .... Setup 3D plot ..........................................................................
     ax_3d.plot(
         *pred_mean_3d[subplot_1d_interval, :].T,
-        color="b",
-        alpha=0.6,
-        lw=0.6,
+        color=COLOR_PREDICTIONS,
+        alpha=COLOR_LINE_3D_ALPHA,
+        lw=THREE_DIM_LW,
+        zorder=2,  # Put behind the ground truth plot
     )
 
     # # Quick-hack to prevent 3D aspect ratio skewing
@@ -351,8 +377,13 @@ def three_dimension_prediction_plot(
         state_space_3d_target=state_space_3d_target[1:, ...],
         pred_mean_3d=pred_mean_3d[:-1, ...],
         pred_std_3d=pred_std_3d[:-1, ...],
+        pred_epi_std_3d=pred_epi_std_3d[:-1, ...],
         subplot_1d_interval=subplot_1d_interval,
         selected_dimension=DIM_Z,
+        show_ale_uncertainty=show_ale_uncertainty,
+        ale_uncertainty_scaling=ale_uncertainty_scaling,
+        show_epi_uncertainty=show_epi_uncertainty,
+        epi_uncertainty_scaling=epi_uncertainty_scaling,
     )
 
     ax_x = _setup_1d_axis_prediction_subplot(
@@ -362,8 +393,13 @@ def three_dimension_prediction_plot(
         state_space_3d_target=state_space_3d_target[1:, ...],
         pred_mean_3d=pred_mean_3d[:-1, ...],
         pred_std_3d=pred_std_3d[:-1, ...],
+        pred_epi_std_3d=pred_epi_std_3d[:-1, ...],
         subplot_1d_interval=subplot_1d_interval,
         selected_dimension=DIM_X,
+        show_ale_uncertainty=show_ale_uncertainty,
+        ale_uncertainty_scaling=ale_uncertainty_scaling,
+        show_epi_uncertainty=show_epi_uncertainty,
+        epi_uncertainty_scaling=epi_uncertainty_scaling,
     )
 
     ax_y = _setup_1d_axis_prediction_subplot(
@@ -373,8 +409,13 @@ def three_dimension_prediction_plot(
         state_space_3d_target=state_space_3d_target[1:, ...],
         pred_mean_3d=pred_mean_3d[:-1, ...],
         pred_std_3d=pred_std_3d[:-1, ...],
+        pred_epi_std_3d=pred_epi_std_3d[:-1, ...],
         subplot_1d_interval=subplot_1d_interval,
         selected_dimension=DIM_Y,
+        show_ale_uncertainty=show_ale_uncertainty,
+        ale_uncertainty_scaling=ale_uncertainty_scaling,
+        show_epi_uncertainty=show_epi_uncertainty,
+        epi_uncertainty_scaling=epi_uncertainty_scaling,
     )
 
     # ax_z.legend(loc="upper right", bbox_to_anchor=(1.0, 1.1))
@@ -383,6 +424,8 @@ def three_dimension_prediction_plot(
         loc="upper right",
         bbox_to_anchor=LEGEND_BBOX_TO_ANCHOR,
         bbox_transform=fig.transFigure,
+        numpoints=3,
+        markerscale=11.0,
     )
     return fig, ax_3d, ax_z, ax_x, ax_y
 
@@ -394,49 +437,122 @@ def _setup_1d_axis_prediction_subplot(
     state_space_3d_target: np.ndarray,
     pred_mean_3d: np.ndarray,
     pred_std_3d: np.ndarray,
+    pred_epi_std_3d: np.ndarray,
     subplot_1d_interval: slice,
-    selected_dimension,
+    selected_dimension: int,
+    show_ale_uncertainty: bool = True,
+    ale_uncertainty_scaling: float = ALE_UNCERTAINTY_SCALING_DEFAULT,
+    show_epi_uncertainty: bool = True,
+    epi_uncertainty_scaling: float = EPI_UNCERTAINTY_SCALING_DEFAULT,
 ) -> plt.Axes:
-    # .... Target observations ....................................................................
+
+    state_space_3d_target = state_space_3d_target[..., selected_dimension]
+    pred_mean_3d = pred_mean_3d[..., selected_dimension]
+    pred_std_3d = pred_std_3d[..., selected_dimension]
+    pred_epi_std_3d = pred_epi_std_3d[..., selected_dimension]
+    pred_ale_std_3d = pred_std_3d - pred_epi_std_3d
+
+    epi_upper_bound = pred_mean_3d + pred_epi_std_3d * epi_uncertainty_scaling
+    epi_lower_bound = pred_mean_3d - pred_epi_std_3d * epi_uncertainty_scaling
+
+    ale_upper_bound = epi_upper_bound + pred_ale_std_3d * ale_uncertainty_scaling
+    ale_lower_bound = epi_lower_bound - pred_ale_std_3d * ale_uncertainty_scaling
+
+    # .... Observations ...........................................................................
     axis.plot(
         time_space,
-        state_space_3d_target[..., selected_dimension],
+        state_space_3d_target,
         ".",
-        color="red",
-        markersize=1.5,
-        alpha=0.19,
-        label="Target env measurement noise",
+        color=COLOR_OBSERVATIONS,
+        markersize=MARKERSIZE_OBSERVATIONS,
+        alpha=COLOR_OBSERVATIONS_ALPHA,
+        zorder=4,  # Put in front of predictions
+        label="Observations",
     )
 
     # .... Predictions ............................................................................
     axis.plot(
         time_space,
-        pred_mean_3d[..., selected_dimension],
+        pred_mean_3d,
         ".",
-        color="b",
-        markersize=1.5,
-        alpha=0.3,
-        label="Prediction",
+        color=COLOR_PREDICTIONS,
+        markersize=MARKERSIZE_PREDICTIONS,
+        alpha=COLOR_PREDICTIONS_ALPHA,
+        zorder=3,  # Put behind the ground truth plot but in front of fills
+        label="Predictions",
     )
 
-    # .... Standard deviation .....................................................................
-    axis.fill_between(
-        time_space,
-        pred_mean_3d[..., selected_dimension],
-        pred_mean_3d[..., selected_dimension]
-        + 2 * pred_std_3d[..., selected_dimension],
-        color="b",
-        alpha=0.2,
-        label="Uncertainty (ale + epi)",
-    )
-    axis.fill_between(
-        time_space,
-        pred_mean_3d[..., selected_dimension]
-        - 2 * pred_std_3d[..., selected_dimension],
-        pred_mean_3d[..., selected_dimension],
-        color="b",
-        alpha=0.2,
-    )
+    # .... Aleatoric uncertainty standard deviation ...............................................
+    if show_ale_uncertainty and show_epi_uncertainty:
+        axis.fill_between(
+            time_space,
+            ale_upper_bound,
+            epi_upper_bound,
+            color=COLOR_ALE,
+            alpha=COLOR_ALE_ALPHA,
+            linewidth=0,
+            antialiased=True,
+            zorder=1,  # Put behind EPI fills
+            label=f"Aleatoric uncertainty ({ale_uncertainty_scaling}X scaled)",
+        )
+        axis.fill_between(
+            time_space,
+            epi_lower_bound,
+            ale_lower_bound,
+            color=COLOR_ALE,
+            linewidth=0,
+            alpha=COLOR_ALE_ALPHA,
+            antialiased=True,
+            zorder=1,  # Put behind EPI fills
+        )
+    elif show_ale_uncertainty and not show_epi_uncertainty:
+        axis.fill_between(
+            time_space,
+            pred_mean_3d + pred_std_3d * ale_uncertainty_scaling,
+            pred_mean_3d - pred_std_3d * ale_uncertainty_scaling,
+            color=COLOR_ALE,
+            alpha=COLOR_ALE_ALPHA,
+            linewidth=0,
+            antialiased=True,
+            zorder=1,
+            label=f"Aleatoric uncertainty ({ale_uncertainty_scaling}X scaled)",
+        )
+
+    # .... Epistemic uncertainty standard deviation ...............................................
+    if show_epi_uncertainty:
+        axis.fill_between(
+            time_space,
+            epi_upper_bound,
+            epi_lower_bound,
+            color=COLOR_EPI,
+            alpha=COLOR_EPI_ALPHA,
+            linewidth=0,
+            antialiased=True,
+            zorder=2,  # Put behind predictions but in front of EPI fills
+            label=f"Epistemic uncertainty ({epi_uncertainty_scaling}X scaled)",
+        )
+        # Alt setup
+        # axis.fill_between(
+        #     time_space,
+        #     epi_upper_bound,
+        #     pred_mean_3d,
+        #     color=COLOR_EPI,
+        #     alpha=COLOR_EPI_ALPHA,
+        #     label="Uncertainty (epistemic)",
+        #     linewidth=0,
+        #     zorder=2,  # Put behind predictions but in front of EPI fills
+        #     antialiased=True,
+        # )
+        # axis.fill_between(
+        #     time_space,
+        #     pred_mean_3d,
+        #     epi_lower_bound,
+        #     color=COLOR_EPI,
+        #     alpha=COLOR_EPI_ALPHA,
+        #     linewidth=0,
+        #     zorder=2,  # Put behind predictions but in front of EPI fills
+        #     antialiased=True,
+        # )
 
     # .... Subplot limits .........................................................................
     axis.set_ylim(auto=True)

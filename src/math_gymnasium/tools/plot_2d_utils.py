@@ -5,6 +5,7 @@ import numpy as np
 import omegaconf
 import torch
 
+from math_gymnasium.tools.style import *
 from matplotlib import pyplot as plt
 
 
@@ -43,7 +44,15 @@ def two_dimension_environment_space_plot(
     figsize: tuple = (20, 8),
 ) -> Tuple[plt.Figure, plt.Axes]:
     fig, ax = plt.subplots(1, 1, figsize=figsize, dpi=50) # default dpi=100
-    ax.plot(state_space_x, state_space_y, color="r", ls="--", linewidth=2, label=state_space_label)
+
+    ax.plot(state_space_x,
+            state_space_y,
+            color=COLOR_GROUND_TRUTH,
+            alpha=COLOR_GROUND_TRUTH_ALPHA,
+            ls="--",
+            linewidth=2,
+            label=state_space_label)
+
     # ax.plot(state_space_x, target_state_space_y, '.', color='r', markersize=1.9, alpha=0.25,
     # label=state_space_label_)
     show_explorable_label_once = "Explorable region of the state space"
@@ -55,9 +64,9 @@ def two_dimension_environment_space_plot(
                 state_space_x[interval_],
                 state_space_y_with_noise[interval_],
                 ".",
-                color="black",
-                markersize=1.9,
-                alpha=0.25,
+                color=COLOR_OBSERVATIONS,
+                markersize=MARKERSIZE_OBSERVATIONS,
+                alpha=COLOR_OBSERVATIONS_ALPHA,
                 label=show_sample_label_once,
             )
         ax.axvspan(
@@ -106,24 +115,44 @@ def two_dimension_prediction_plot(
     state_space_y_target = state_space_y_target[1:]
     y_pred = y_pred[:-1]
     y_std = y_std[:-1]
+
+    # .... Observations ...........................................................................
     ax.plot(
         state_space_x,
         state_space_y_target,
         ".",
-        color="red",
-        markersize=1.5,
-        alpha=0.19,
+        color=COLOR_OBSERVATIONS,
+        markersize=MARKERSIZE_OBSERVATIONS,
+        alpha=COLOR_OBSERVATIONS_ALPHA,
         label="Target env measurement noise",
     )
-    ax.plot(state_space_x, y_pred, ".", color="b", markersize=1.5, alpha=0.3, label="Prediction")
+
+    # .... Predictions ............................................................................
+    ax.plot(state_space_x, y_pred, ".",
+            color=COLOR_PREDICTIONS,
+            markersize=MARKERSIZE_PREDICTIONS,
+            alpha=COLOR_PREDICTIONS_ALPHA,
+            label="Prediction")
+
+    # .... Aleatoric uncertainty standard deviation ...............................................
     ax.fill_between(
         state_space_x,
         y_pred,
         y_pred + 2 * y_std,
-        color="b",
-        alpha=0.1,
+        color=COLOR_ALE,
+        alpha=COLOR_ALE_ALPHA,
         label="Uncertainty (ale + epi)",
     )
-    ax.fill_between(state_space_x, y_pred - 2 * y_std, y_pred, color="b", alpha=0.1)
+
+    ax.fill_between(state_space_x, y_pred - 2 * y_std, y_pred,
+                    color=COLOR_ALE,
+                    alpha=COLOR_ALE_ALPHA
+                    )
+
+    # .... Epistemic uncertainty standard deviation ...............................................
+    # (Priority) ToDo: implement EPI fill between.
+    #  Ref _setup_1d_axis_prediction_subplot() fct at
+    #  utilities/math-gymnasium/src/math_gymnasium/tools/plot_3d_utils.py:522
+
     plt.legend(loc="lower right", bbox_to_anchor=(1, -0.18))
     return fig, ax
