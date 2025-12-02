@@ -170,9 +170,9 @@ def three_dimension_environment_space_plot(
 
     ax_z.set_ylabel("z", fontsize=16, **AXIS_LABEL_STYLE)
     ax_y.set_ylabel("y", fontsize=16, **AXIS_LABEL_STYLE)
-    # ax_y.set_xlabel("t", fontsize=16, **AXIS_LABEL_STYLE)
     ax_x.set_ylabel("x", fontsize=16, **AXIS_LABEL_STYLE)
-    ax_x.set_xlabel("t", fontsize=16, **AXIS_LABEL_STYLE)
+
+    ax_x.set_xlabel("time", fontsize=16, **AXIS_LABEL_STYLE)
 
     fig.suptitle(title, size="large", weight="bold")
     fig.tight_layout(pad=2)
@@ -304,7 +304,7 @@ def _setup_1d_axis_subplot(
         # axis.set_xlim(subplot_1d_interval.start, subplot_1d_interval.stop)
         axis.set_xlim(
             time_space[subplot_1d_interval.start],
-            time_space[subplot_1d_interval.stop - 1],
+            time_space[subplot_1d_interval.stop],
         )
 
     return axis
