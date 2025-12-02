@@ -4,7 +4,7 @@ from typing import Tuple
 import numpy as np
 import pytest
 
-from math_gymnasium.tools.chaotic_time_series import (
+from math_gymnasium.dynamical_systems.chaotic_time_series import (
     rollout_lorenz_attractor_partial_derivative,
 )
 

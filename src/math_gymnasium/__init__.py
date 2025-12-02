@@ -10,6 +10,7 @@ Quick Start:
 
 from . import envs
 from . import tools
+from . import dynamical_systems
 
 from gymnasium.envs.registration import register
 from gymnasium.envs.registration import WrapperSpec
@@ -32,4 +33,5 @@ register(
 __all__ = [
         "tools",
         "envs",
-        ]
+        "dynamical_systems",
+    ]
