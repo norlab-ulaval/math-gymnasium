@@ -1,7 +1,9 @@
 # coding=utf-8
 
+# Note: Recommend using same scaling factors for both ale and epi. The options to use distinct ones
+# exist mainly for development purposes.
 ALE_UNCERTAINTY_SCALING_DEFAULT = 2.0
-EPI_UNCERTAINTY_SCALING_DEFAULT = 10.0
+EPI_UNCERTAINTY_SCALING_DEFAULT = 2.0
 
 THREE_DIM_LW = 0.65
 COLOR_LINE_3D_ALPHA = 0.7

@@ -1,6 +1,8 @@
 # coding=utf-8
 
 import numpy as np
+
+from tools.math_tools.ndarray_tools.custom_msg import nan_infinity_console_warning
 from tools.math_tools.space_conversion_tools.time_to_delta_time import (
     convert_state_time_to_state_delta_time,
 )
@@ -13,7 +15,7 @@ def linear_spiral_partial_derivative(
     c: float = 0.5,
     dtype: np.dtype = np.float64,
     debug: bool = False,
-):
+) -> np.ndarray:
     """
     Computes the partial derivatives for a linear spiral system.
 
@@ -27,7 +29,7 @@ def linear_spiral_partial_derivative(
     :param omega: Angular frequency.
     :param c: Constant vertical velocity.
     :param dtype: Data type for computations.
-    :param debug: Enable debug mode.
+    :param debug: Warn if nan or infinity values are encountered.
     :return: An array containing the partial derivatives [x_dot, y_dot, z_dot].
     """
     xyz = np.nan_to_num(xyz)
@@ -38,6 +40,10 @@ def linear_spiral_partial_derivative(
     z_dot = c
 
     xyz_dot = np.array([x_dot, y_dot, z_dot], dtype=dtype)
+
+    if debug and not np.all(np.isfinite(xyz_dot)):
+        nan_infinity_console_warning("xyz_dot")
+
     xyz_dot = np.nan_to_num(xyz_dot)
     return xyz_dot.squeeze()
 
@@ -53,6 +59,17 @@ def rollout_linear_spiral_partial_derivative(
 ) -> np.ndarray:
     """
     Calculates the trajectory of a linear spiral system over a given time space.
+
+    Assume `time_space` values are increassing if `time_space_is_delta_time=True`
+
+    :param time_space: Array representing time steps in wallclock time or delta time.
+    :param a: Damping coefficient (negative for spiral inward).
+    :param omega: Angular frequency.
+    :param c: Constant vertical velocity.
+    :param initiale_coordinates: The state at timestep 0
+    :param time_space_is_delta_time: Set to True if `time_space` is an array of delta time.
+    :param dtype: Data type for computations.
+    :return: Array of computed x, y, z coordinates over the given time space.
     """
     assert isinstance(initiale_coordinates, tuple) and len(initiale_coordinates) == 3
     assert isinstance(time_space, np.ndarray) and time_space.ndim == 1

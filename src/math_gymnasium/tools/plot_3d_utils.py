@@ -16,6 +16,7 @@ DIM_Y = 1
 DIM_Z = 2
 LEGEND_BBOX_TO_ANCHOR = (1.0, 0.99)
 
+
 def prep_arbitrary_dimension_observation_prediction_output_for_1D_plotting(
     selected_dimension: int,
     pred: torch.Tensor,
@@ -493,7 +494,7 @@ def _setup_1d_axis_prediction_subplot(
             linewidth=0,
             antialiased=True,
             zorder=1,  # Put behind EPI fills
-            label=f"Aleatoric uncertainty ({ale_uncertainty_scaling}X scaled)",
+            label=f"Aleatoric uncertainty ({ale_uncertainty_scaling}" + r"$\sigma$)",
         )
         axis.fill_between(
             time_space,
@@ -515,7 +516,7 @@ def _setup_1d_axis_prediction_subplot(
             linewidth=0,
             antialiased=True,
             zorder=1,
-            label=f"Aleatoric uncertainty ({ale_uncertainty_scaling}X scaled)",
+            label=f"Aleatoric uncertainty ({ale_uncertainty_scaling}" + r"$\sigma$)",
         )
 
     # .... Epistemic uncertainty standard deviation ...............................................
@@ -529,7 +530,7 @@ def _setup_1d_axis_prediction_subplot(
             linewidth=0,
             antialiased=True,
             zorder=2,  # Put behind predictions but in front of EPI fills
-            label=f"Epistemic uncertainty ({epi_uncertainty_scaling}X scaled)",
+            label=f"Epistemic uncertainty ({epi_uncertainty_scaling}" + r"$\sigma$)",
         )
         # Alt setup
         # axis.fill_between(

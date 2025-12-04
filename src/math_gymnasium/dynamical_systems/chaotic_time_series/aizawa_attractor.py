@@ -7,29 +7,38 @@ from tools.math_tools.space_conversion_tools.time_to_delta_time import (
 )
 from tools.math_tools.ndarray_tools.custom_msg import nan_infinity_console_warning
 
+# (CRITICAL) ToDo: unit and integration tests (ref task MG-37)
 
-def lorenz_attractor_partial_derivative(
+def aizawa_attractor_partial_derivative(
     xyz: np.ndarray,
-    s: float = 10.0,
-    r: float = 28.0,
-    b: float = 2.667,
+    a: float = 0.95,
+    b: float = 0.7,
+    c: float = 0.6,
+    d: float = 3.5,
+    e: float = 0.25,
+    f: float = 0.1,
     dtype: np.dtype = np.float64,
     debug: bool = False,
-) -> np.ndarray:
+):
     """
-    Computes the partial derivatives for the Lorenz attractor system chaotic time series.
+    Computes the partial derivatives for the Aizawa attractor system.
 
-    Inspired by: https://en.wikipedia.org/wiki/Lorenz_system#Python_simulation
+    System equations:
+    dx/dt = (z - b)*x - d*y
+    dy/dt = d*x + (z - b)*y
+    dz/dt = c + a*z - z^3/3 - (x^2 + y^2)*(1 + e*z) + f*z*x^3
 
     :param xyz: An array containing the x, y, and z coordinates.
-    :param s: Initial condition Sigma parameter of the Lorenz system.
-    :param r: Initial condition Rho parameter of the Lorenz system.
-    :param b: Initial condition Beta parameter of the Lorenz system.
+    :param a: System parameter (typically 0.95).
+    :param b: System parameter (typically 0.7).
+    :param c: System parameter (typically 0.6).
+    :param d: System parameter (typically 3.5).
+    :param e: System parameter (typically 0.25).
+    :param f: System parameter (typically 0.1).
     :param dtype: Data type for computations.
-    :param debug: Warn if nan or infinity values are encountered.
+    :param debug: Enable debug mode.
     :return: An array containing the partial derivatives [x_dot, y_dot, z_dot].
     """
-
     if debug and not np.all(np.isfinite(xyz)):
         nan_infinity_console_warning("xyz")
 
@@ -38,13 +47,17 @@ def lorenz_attractor_partial_derivative(
     xyz = np.nan_to_num(xyz)
 
     x, y, z = xyz.astype(dtype)
-    s = np.array(s, dtype)
-    r = np.array(r, dtype)
+    a = np.array(a, dtype)
     b = np.array(b, dtype)
+    c = np.array(c, dtype)
+    d = np.array(d, dtype)
+    e = np.array(e, dtype)
+    f = np.array(f, dtype)
 
-    x_dot = s * (y - x)
-    y_dot = r * x - y - x * z
-    z_dot = x * y - b * z
+    x_dot = (z - b) * x - d * y
+    y_dot = d * x + (z - b) * y
+    z_dot = c + a * z - (z**3) / 3.0 - (x**2 + y**2) * (1.0 + e * z) + f * z * (x**3)
+
     xyz_dot = np.array([x_dot, y_dot, z_dot], dtype=dtype)
 
     if debug and not np.all(np.isfinite(xyz_dot)):
@@ -54,24 +67,30 @@ def lorenz_attractor_partial_derivative(
     return xyz_dot.squeeze()
 
 
-def rollout_lorenz_attractor_partial_derivative(
+def rollout_aizawa_attractor_partial_derivative(
     time_space: np.ndarray,
-    s: float = 10.0,
-    r: float = 28.0,
-    b: float = 2.667,
-    initiale_coordinates=(0.0, 1.0, 1.05),
+    a: float = 0.95,
+    b: float = 0.7,
+    c: float = 0.6,
+    d: float = 3.5,
+    e: float = 0.25,
+    f: float = 0.1,
+    initiale_coordinates=(0.1, 0.0, 0.0),
     time_space_is_delta_time: bool = False,
     dtype: np.dtype = np.float64,
 ) -> np.ndarray:
     """
-    Calculates the partial derivatives of the Lorenz attractor equations over a given time space.
+    Calculates the trajectory of the Aizawa attractor over a given time space.
 
     Assume `time_space` values are increassing if `time_space_is_delta_time=True`
 
     :param time_space: Array representing time steps in wallclock time or delta time.
-    :param s: Initial condition Sigma parameter of the Lorenz system.
-    :param r: Initial condition Rho parameter of the Lorenz system.
-    :param b: Initial condition Beta parameter of the Lorenz system.
+    :param a: System parameter (typically 0.95).
+    :param b: System parameter (typically 0.7).
+    :param c: System parameter (typically 0.6).
+    :param d: System parameter (typically 3.5).
+    :param e: System parameter (typically 0.25).
+    :param f: System parameter (typically 0.1).
     :param initiale_coordinates: The state at timestep 0
     :param time_space_is_delta_time: Set to True if `time_space` is an array of delta time.
     :param dtype: Data type for computations.
@@ -85,19 +104,18 @@ def rollout_lorenz_attractor_partial_derivative(
 
     xyzs[0] = initiale_coordinates
     xyzs_partial_derivative[0] = (0.0, 0.0, 0.0)
+
     if not time_space_is_delta_time:
         delta_time = convert_state_time_to_state_delta_time(time_space.astype(dtype))
     else:
         delta_time = time_space.copy().astype(dtype)
 
     for i in np.arange(time_space.size - 1):
-        xyzs_partial_derivative[i + 1] = lorenz_attractor_partial_derivative(
-            xyzs[i], s, r, b, dtype
+        xyzs_partial_derivative[i + 1] = aizawa_attractor_partial_derivative(
+            xyzs[i], a, b, c, d, e, f, dtype
         )
         xyzs[i + 1] = xyzs[i] + xyzs_partial_derivative[i + 1] * delta_time[i + 1]
 
-    assert np.all(
-        np.isfinite(xyzs_partial_derivative)
-    ), "Nan value detected in `xyzs_partial_derivative`"
-    assert np.all(np.isfinite(xyzs)), "Nan value detected in `xyzs`"
+    assert np.all(np.isfinite(xyzs_partial_derivative))
+    assert np.all(np.isfinite(xyzs))
     return xyzs
