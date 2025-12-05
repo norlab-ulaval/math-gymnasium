@@ -61,6 +61,7 @@ def rollout_simple_limit_cycle_partial_derivative(
     """
     Calculates the trajectory of a simple limit cycle system (Van der Pol-like) over a given time space.
 
+    https://en.wikipedia.org/wiki/Van_der_Pol_oscillator
 
     Assume `time_space` values are increassing if `time_space_is_delta_time=True`
 

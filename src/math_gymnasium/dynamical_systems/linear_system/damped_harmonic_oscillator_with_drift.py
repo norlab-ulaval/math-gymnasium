@@ -28,7 +28,7 @@ def damped_oscillator_partial_derivative(
     :param xyz: An array containing the x (position), y (velocity), and z coordinates.
     :param gamma: Damping coefficient.
     :param omega0: Natural frequency.
-    :param vz: Drift velocity in z direction.
+    :param vz: Drift velocity in z direction (Set to 0 to focus on x-y dynamics).
     :param dtype: Data type for computations.
     :param debug: Warn if nan or infinity values are encountered.
     :return: An array containing the partial derivatives [x_dot, y_dot, z_dot].
@@ -66,7 +66,7 @@ def rollout_damped_oscillator_partial_derivative(
     :param time_space: Array representing time steps in wallclock time or delta time.
     :param gamma: Damping coefficient.
     :param omega0: Natural frequency.
-    :param vz: Drift velocity in z direction.
+    :param vz: Drift velocity in z direction (Set to 0 to focus on x-y dynamics).
     :param initiale_coordinates: The state at timestep 0
     :param time_space_is_delta_time: Set to True if `time_space` is an array of delta time.
     :param dtype: Data type for computations.

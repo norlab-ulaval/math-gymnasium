@@ -12,7 +12,7 @@ from ..general_test_utilities import numpy_array_print_precision_warning
 from math_gymnasium.envs.arbitrary_dim_math_continuous import (
     MathContinuousGymnasium,
 )
-from math_gymnasium.dynamical_systems.chaotic_time_series import (
+from math_gymnasium.dynamical_systems.chaotic_system import (
     rollout_lorenz_attractor_partial_derivative,
 )
 from tools.math_tools.space_conversion_tools.coordinate_to_velocity import (

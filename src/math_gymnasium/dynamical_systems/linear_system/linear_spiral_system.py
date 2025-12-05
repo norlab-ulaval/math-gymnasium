@@ -27,7 +27,7 @@ def linear_spiral_partial_derivative(
     :param xyz: An array containing the x, y, and z coordinates.
     :param a: Damping coefficient (negative for spiral inward).
     :param omega: Angular frequency.
-    :param c: Constant vertical velocity.
+    :param c: Constant vertical velocity (Set to 0 to focus on x-y dynamics).
     :param dtype: Data type for computations.
     :param debug: Warn if nan or infinity values are encountered.
     :return: An array containing the partial derivatives [x_dot, y_dot, z_dot].
@@ -65,7 +65,7 @@ def rollout_linear_spiral_partial_derivative(
     :param time_space: Array representing time steps in wallclock time or delta time.
     :param a: Damping coefficient (negative for spiral inward).
     :param omega: Angular frequency.
-    :param c: Constant vertical velocity.
+    :param c: Constant vertical velocity (Set to 0 to focus on x-y dynamics).
     :param initiale_coordinates: The state at timestep 0
     :param time_space_is_delta_time: Set to True if `time_space` is an array of delta time.
     :param dtype: Data type for computations.

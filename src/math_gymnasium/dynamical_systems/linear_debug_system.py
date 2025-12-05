@@ -2,6 +2,7 @@
 
 import numpy as np
 
+
 def rollout_linear_debug_system(
     time_space: np.ndarray,
     initiale_coordinates=(0.0, 0.0, 0.0),
@@ -34,12 +35,8 @@ def rollout_linear_debug_system(
 
     xyzs += initiale_coordinates
 
-    x_dot = 0.1
-    y_dot = 0.2
-    z_dot = 0.3
-    xyz_dot = np.array([x_dot, y_dot, z_dot], dtype=dtype)
-
-    for i in np.arange(time_space.size):
-        xyzs[i] += xyz_dot
+    xyzs[:, 0] += 0.1
+    xyzs[:, 1] += 0.2
+    xyzs[:, 2] += 0.3
 
     return xyzs
