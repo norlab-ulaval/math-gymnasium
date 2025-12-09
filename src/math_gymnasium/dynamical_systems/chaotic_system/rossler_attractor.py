@@ -70,6 +70,8 @@ def rollout_rossler_attractor_partial_derivative(
     Calculates the trajectory of the Rössler attractor over a given time space.
     Remark: The Rössler attractor is simpler than Lorenz with only one nonlinear term.
 
+    Ref: https://en.wikipedia.org/wiki/Rössler_attractor
+
     Assume `time_space` values are increassing if `time_space_is_delta_time=True`
 
     :param time_space: Array representing time steps in wallclock time or delta time.
