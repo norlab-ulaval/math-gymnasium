@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 
 from math_gymnasium.tools.style import *
 from tools.dna_dev_tools.dn_pytest_tools import is_pytest_run
+from tools.math_tools.normalization import min_max_normalization
 from tools.plot_tools.style import AXIS_LABEL_STYLE
 
 DIM_X = 0
@@ -78,7 +79,35 @@ def three_dimension_environment_space_plot(
     # ax_3d = fig.add_subplot(2, 2, 1, projection="3d")
     ax_3d = fig.add_subplot(gs[:, 0:3], projection="3d")
 
-    ax_3d.plot(
+    # .... Observations ...........................................................................
+    # Shrink noise visualization below a treshold
+    noise_dynamic_size = (
+        np.absolute(
+            state_space_3d_with_noise[subplot_1d_interval, :]
+            - state_space_3d[subplot_1d_interval, :]
+        )
+    ).mean(axis=-1)
+
+    noise_dynamic_size = 5 * min_max_normalization(noise_dynamic_size, scale_min=0.0, scale_max=1.0)
+
+    # Visualize noise "blur/glow" layers
+    for each_z, (each_ms, each_a) in enumerate([(5, 0.025), (2, 0.07), (1.0, 0.7)]):
+        ax_3d.scatter3D(
+            *state_space_3d_with_noise[subplot_1d_interval, :].T,
+            # marker=".",
+            marker="o",
+            s=THREE_DIM_LW
+            * COLOR_GROUND_TRUTH_NOISE_BLUR_MARKERSIZE
+            * noise_dynamic_size**2 * each_ms**2,
+            color=COLOR_GROUND_TRUTH_NOISE_BLUR,
+            alpha=COLOR_GROUND_TRUTH_NOISE_BLUR_ALPHA * each_a,
+            zorder=each_z+1,  # Put in behind the system ground thruth
+            depthshade=False,  # keeps your glow alpha/color more faithful
+            linewidths=0,
+        )
+
+    # .... Theoretical environment ................................................................
+    ax_3d.plot3D(
         *state_space_3d[subplot_1d_interval, :].T,
         # *state_space_3d_with_noise[subplot_1d_interval, :].T,
         color=COLOR_GROUND_TRUTH,
@@ -86,31 +115,6 @@ def three_dimension_environment_space_plot(
         lw=THREE_DIM_LW,
         zorder=4,  # Put in front of predictions
     )
-
-    # Shrink noise visualization below a treshold
-    noise_alpha_treshold = (
-        100.0
-        * np.absolute(
-            state_space_3d_with_noise[subplot_1d_interval, :]
-            - state_space_3d[subplot_1d_interval, :]
-        )
-    ).mean()
-    if noise_alpha_treshold > 1.0:
-        noise_alpha_treshold = 1.0
-
-    # Visualize noise "blur/glow" layers
-    for each_ms, each_a in [(12, 0.075), (7, 0.15), (2, 0.3), (1, 0.9)]:
-        each_ms *= COLOR_GROUND_TRUTH_NOISE_BLUR_MARKERSIZE
-        each_a *= COLOR_GROUND_TRUTH_NOISE_BLUR_ALPHA * noise_alpha_treshold
-
-        ax_3d.plot(
-            *state_space_3d_with_noise[subplot_1d_interval, :].T,
-            ".",
-            color=COLOR_GROUND_TRUTH_NOISE_BLUR,
-            alpha=each_a,
-            markersize=THREE_DIM_LW * each_ms,
-            zorder=3,  # Put in behind the system ground thruth
-        )
 
     # Quick-hack to prevent 3D aspect ratio skewing
     # Credit: https://stackoverflow.com/a/72928548
@@ -312,18 +316,18 @@ def _setup_1d_axis_subplot(
 
             # Shrink noise visualization below a treshold
             noise_alpha_treshold = (
-                100.0
-                * np.absolute(
+                np.absolute(
                     state_space_with_noise[explorable_interval, selected_dimension]
                     - state_space[explorable_interval, selected_dimension]
-                ).mean()
+                )
             )
-            if noise_alpha_treshold > 1.0:
-                noise_alpha_treshold = 1.0
+            noise_alpha_treshold = 5 * min_max_normalization(
+                noise_alpha_treshold, scale_min=0.01, scale_max=1.0
+            ).mean()
 
             # Visualize noise "blur/glow" layers
-            for each_ms, each_a in [(10, 0.025), (5, 0.15), (1.5, 0.6)]:
-                each_ms *= COLOR_GROUND_TRUTH_NOISE_BLUR_MARKERSIZE
+            for each_ms, each_a in [(12, 0.09), (6, 0.2), (2, 0.5)]:
+                each_ms *= COLOR_GROUND_TRUTH_NOISE_BLUR_MARKERSIZE * MARKERSIZE_OBSERVATIONS
                 each_a *= COLOR_GROUND_TRUTH_NOISE_BLUR_ALPHA * noise_alpha_treshold
 
                 axis.plot(
@@ -332,7 +336,7 @@ def _setup_1d_axis_subplot(
                     ".",
                     color=COLOR_GROUND_TRUTH_NOISE_BLUR,
                     alpha=each_a,
-                    markersize=MARKERSIZE_OBSERVATIONS * each_ms,
+                    markersize=each_ms,
                     zorder=3,  # Put in behind the system ground thruth
                 )
 
@@ -407,12 +411,14 @@ def three_dimension_prediction_plot(
     )
 
     # .... Setup 3D plot ..........................................................................
-    ax_3d.plot(
+    # Show predictions
+    ax_3d.plot3D(
         *pred_mean_3d[subplot_1d_interval, :].T,
         color=COLOR_PREDICTIONS,
         alpha=COLOR_LINE_3D_ALPHA,
         lw=THREE_DIM_LW,
-        zorder=2,  # Put behind the ground truth plot
+        # zorder=2,  # Put behind the ground truth plot
+        zorder=5,  # Put in front of the ground truth plot
     )
 
     # # Quick-hack to prevent 3D aspect ratio skewing
