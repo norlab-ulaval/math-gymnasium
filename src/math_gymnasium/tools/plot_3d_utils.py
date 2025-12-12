@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 
 from math_gymnasium.tools.style import *
 from tools.dna_dev_tools.dn_pytest_tools import is_pytest_run
+from tools.math_tools.math_fct import numpy_softplus
 from tools.math_tools.normalization import min_max_normalization
 from tools.plot_tools.style import AXIS_LABEL_STYLE
 
@@ -88,7 +89,8 @@ def three_dimension_environment_space_plot(
         )
     ).mean(axis=-1)
 
-    noise_dynamic_size = 5 * min_max_normalization(noise_dynamic_size, scale_min=0.0, scale_max=1.0)
+    noise_dynamic_size = 1.5 * numpy_softplus(noise_dynamic_size, beta=1.0)
+    noise_dynamic_size = noise_dynamic_size.clip(max=3.0)
 
     # Visualize noise "blur/glow" layers
     for each_z, (each_ms, each_a) in enumerate([(5, 0.025), (2, 0.07), (1.0, 0.7)]):
@@ -98,10 +100,11 @@ def three_dimension_environment_space_plot(
             marker="o",
             s=THREE_DIM_LW
             * COLOR_GROUND_TRUTH_NOISE_BLUR_MARKERSIZE
-            * noise_dynamic_size**2 * each_ms**2,
+            * noise_dynamic_size**2
+            * each_ms**2,
             color=COLOR_GROUND_TRUTH_NOISE_BLUR,
             alpha=COLOR_GROUND_TRUTH_NOISE_BLUR_ALPHA * each_a,
-            zorder=each_z+1,  # Put in behind the system ground thruth
+            zorder=each_z + 1,  # Put in behind the system ground thruth
             depthshade=False,  # keeps your glow alpha/color more faithful
             linewidths=0,
         )
@@ -315,19 +318,30 @@ def _setup_1d_axis_subplot(
             )
 
             # Shrink noise visualization below a treshold
-            noise_alpha_treshold = (
-                np.absolute(
-                    state_space_with_noise[explorable_interval, selected_dimension]
-                    - state_space[explorable_interval, selected_dimension]
-                )
+            # noise_alpha_treshold = np.absolute(
+            #     state_space_with_noise[explorable_interval, selected_dimension]
+            #     - state_space[explorable_interval, selected_dimension]
+            # )
+            # noise_alpha_treshold = (
+            #     5
+            #     * min_max_normalization(
+            #         noise_alpha_treshold, scale_min=0.01, scale_max=1.0
+            #     ).mean()
+            # )
+
+            noise_alpha_treshold = np.absolute(
+                state_space_with_noise[explorable_interval, selected_dimension]
+                - state_space[explorable_interval, selected_dimension]
             )
-            noise_alpha_treshold = 5 * min_max_normalization(
-                noise_alpha_treshold, scale_min=0.01, scale_max=1.0
-            ).mean()
+            noise_alpha_treshold = 1.0 * numpy_softplus(noise_alpha_treshold, beta=7.0)
+            noise_alpha_treshold = 0.75 * noise_alpha_treshold.clip(max=2.0)
+            noise_alpha_treshold = noise_alpha_treshold.mean()
 
             # Visualize noise "blur/glow" layers
-            for each_ms, each_a in [(12, 0.09), (6, 0.2), (2, 0.5)]:
-                each_ms *= COLOR_GROUND_TRUTH_NOISE_BLUR_MARKERSIZE * MARKERSIZE_OBSERVATIONS
+            for each_ms, each_a in [(12, 0.09), (6, 0.2), (2, 0.65)]:
+                each_ms *= (
+                    COLOR_GROUND_TRUTH_NOISE_BLUR_MARKERSIZE * MARKERSIZE_OBSERVATIONS
+                )
                 each_a *= COLOR_GROUND_TRUTH_NOISE_BLUR_ALPHA * noise_alpha_treshold
 
                 axis.plot(
