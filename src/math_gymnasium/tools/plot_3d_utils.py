@@ -80,11 +80,37 @@ def three_dimension_environment_space_plot(
 
     ax_3d.plot(
         *state_space_3d[subplot_1d_interval, :].T,
+        # *state_space_3d_with_noise[subplot_1d_interval, :].T,
         color=COLOR_GROUND_TRUTH,
         alpha=COLOR_LINE_3D_ALPHA,
         lw=THREE_DIM_LW,
         zorder=4,  # Put in front of predictions
     )
+
+    # Shrink noise visualization below a treshold
+    noise_alpha_treshold = (
+        100.0
+        * np.absolute(
+            state_space_3d_with_noise[subplot_1d_interval, :]
+            - state_space_3d[subplot_1d_interval, :]
+        )
+    ).mean()
+    if noise_alpha_treshold > 1.0:
+        noise_alpha_treshold = 1.0
+
+    # Visualize noise "blur/glow" layers
+    for each_ms, each_a in [(12, 0.075), (7, 0.15), (2, 0.3), (1, 0.9)]:
+        each_ms *= COLOR_GROUND_TRUTH_NOISE_BLUR_MARKERSIZE
+        each_a *= COLOR_GROUND_TRUTH_NOISE_BLUR_ALPHA * noise_alpha_treshold
+
+        ax_3d.plot(
+            *state_space_3d_with_noise[subplot_1d_interval, :].T,
+            ".",
+            color=COLOR_GROUND_TRUTH_NOISE_BLUR,
+            alpha=each_a,
+            markersize=THREE_DIM_LW * each_ms,
+            zorder=3,  # Put in behind the system ground thruth
+        )
 
     # Quick-hack to prevent 3D aspect ratio skewing
     # Credit: https://stackoverflow.com/a/72928548
@@ -283,6 +309,33 @@ def _setup_1d_axis_subplot(
                 label=show_sample_label_once,
                 zorder=4,  # Put in front of predictions
             )
+
+            # Shrink noise visualization below a treshold
+            noise_alpha_treshold = (
+                100.0
+                * np.absolute(
+                    state_space_with_noise[explorable_interval, selected_dimension]
+                    - state_space[explorable_interval, selected_dimension]
+                ).mean()
+            )
+            if noise_alpha_treshold > 1.0:
+                noise_alpha_treshold = 1.0
+
+            # Visualize noise "blur/glow" layers
+            for each_ms, each_a in [(10, 0.025), (5, 0.15), (1.5, 0.6)]:
+                each_ms *= COLOR_GROUND_TRUTH_NOISE_BLUR_MARKERSIZE
+                each_a *= COLOR_GROUND_TRUTH_NOISE_BLUR_ALPHA * noise_alpha_treshold
+
+                axis.plot(
+                    time_space[explorable_interval],
+                    state_space_with_noise[explorable_interval, selected_dimension].T,
+                    ".",
+                    color=COLOR_GROUND_TRUTH_NOISE_BLUR,
+                    alpha=each_a,
+                    markersize=MARKERSIZE_OBSERVATIONS * each_ms,
+                    zorder=3,  # Put in behind the system ground thruth
+                )
+
         show_sample_label_once = ""
 
         if show_explorable_space:
