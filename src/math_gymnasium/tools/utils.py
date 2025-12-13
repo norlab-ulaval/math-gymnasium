@@ -1,6 +1,8 @@
 # coding=utf-8
 from typing import Union
 
+import numpy as np
+
 from math_gymnasium.envs.arbitrary_dim_math_continuous import (
     MathContinuousGymnasium,
 )
@@ -33,3 +35,24 @@ def math_continuous_gymnasium_env_to_test_motion_trajectory_dataclass(
         actions=trj.time_axis.obs_with_noise,
         pose=trj.state_axes.poses_with_noise,
     )
+
+
+def agreement_score_relative_exp(
+    x: np.ndarray, scale: float = 1.0, eps: float = 1e-12
+) -> float:
+    """
+    Computes an agreement score based on a relative exponential model.
+
+    :param x: An array of numeric values for which the agreement score is computed.
+    :param scale: A positive scaling factor that affects the agreement computation.
+        Smaller => harsher penalty.
+    :param eps: A small positive number added to prevent division by zero.
+    :return: A scale-invariant agreement score in (0,1].
+    :raises ValueError: If the provided scale is not greater than zero.
+    """
+    x = np.asarray(x, dtype=float)
+    denom = abs(float(x.mean())) + eps
+    r = float((x.max() - x.min()) / denom)
+    if scale <= 0:
+        raise ValueError("scale must be > 0")
+    return float(np.exp(-r / scale))

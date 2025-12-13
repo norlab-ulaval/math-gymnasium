@@ -8,9 +8,9 @@ import torch
 from matplotlib import pyplot as plt
 
 from math_gymnasium.tools.style import *
+from math_gymnasium.tools.utils import agreement_score_relative_exp
 from tools.dna_dev_tools.dn_pytest_tools import is_pytest_run
 from tools.math_tools.math_fct import numpy_softplus
-from tools.math_tools.normalization import min_max_normalization
 from tools.plot_tools.style import AXIS_LABEL_STYLE
 
 DIM_X = 0
@@ -80,35 +80,6 @@ def three_dimension_environment_space_plot(
     # ax_3d = fig.add_subplot(2, 2, 1, projection="3d")
     ax_3d = fig.add_subplot(gs[:, 0:3], projection="3d")
 
-    # .... Observations ...........................................................................
-    # Shrink noise visualization below a treshold
-    noise_dynamic_size = (
-        np.absolute(
-            state_space_3d_with_noise[subplot_1d_interval, :]
-            - state_space_3d[subplot_1d_interval, :]
-        )
-    ).mean(axis=-1)
-
-    noise_dynamic_size = 1.5 * numpy_softplus(noise_dynamic_size, beta=1.0)
-    noise_dynamic_size = noise_dynamic_size.clip(max=3.0)
-
-    # Visualize noise "blur/glow" layers
-    for each_z, (each_ms, each_a) in enumerate([(5, 0.025), (2, 0.07), (1.0, 0.7)]):
-        ax_3d.scatter3D(
-            *state_space_3d_with_noise[subplot_1d_interval, :].T,
-            # marker=".",
-            marker="o",
-            s=THREE_DIM_LW
-            * COLOR_GROUND_TRUTH_NOISE_BLUR_MARKERSIZE
-            * noise_dynamic_size**2
-            * each_ms**2,
-            color=COLOR_GROUND_TRUTH_NOISE_BLUR,
-            alpha=COLOR_GROUND_TRUTH_NOISE_BLUR_ALPHA * each_a,
-            zorder=each_z + 1,  # Put in behind the system ground thruth
-            depthshade=False,  # keeps your glow alpha/color more faithful
-            linewidths=0,
-        )
-
     # .... Theoretical environment ................................................................
     ax_3d.plot3D(
         *state_space_3d[subplot_1d_interval, :].T,
@@ -123,6 +94,42 @@ def three_dimension_environment_space_plot(
     # Credit: https://stackoverflow.com/a/72928548
     limits = np.array([getattr(ax_3d, f"get_{axis}lim")() for axis in "xyz"])
     ax_3d.set_box_aspect(np.ptp(limits, axis=1))
+
+    # .... Observations ...........................................................................
+    lower_limits = limits[..., 0]
+    upper_limits = limits[..., 1]
+    axis_len = upper_limits - lower_limits
+    limits_ratio = agreement_score_relative_exp(axis_len, scale=1.0)
+
+    # Shrink noise visualization below a treshold
+    noise_dynamic_size = (
+        np.absolute(
+            state_space_3d_with_noise[subplot_1d_interval, :]
+            - state_space_3d[subplot_1d_interval, :]
+        )
+    ).mean(axis=-1)
+
+    noise_dynamic_size = 2.5 * numpy_softplus(noise_dynamic_size, beta=1.0)
+    noise_dynamic_size = noise_dynamic_size.clip(max=4.0)
+
+    # Visualize noise "blur/glow" layers
+    # three_d_noise_blur_cfg = [(6, 0.025), (3, 0.08), (1.5, 0.5)]
+    three_d_noise_blur_cfg = [(3.05, 0.075), (2.25, 0.25), (1.05, 0.66)]
+    for each_z, (each_ms, each_a) in enumerate(three_d_noise_blur_cfg):
+        ax_3d.scatter3D(
+            *state_space_3d_with_noise[subplot_1d_interval, :].T,
+            # marker=".",
+            marker="o",
+            s=THREE_DIM_LW
+            * COLOR_GROUND_TRUTH_NOISE_BLUR_MARKERSIZE
+            * noise_dynamic_size**2
+            * each_ms**2 * limits_ratio,
+            color=COLOR_GROUND_TRUTH_NOISE_BLUR[each_z],
+            alpha=COLOR_GROUND_TRUTH_NOISE_BLUR_ALPHA * each_a,
+            zorder=each_z + 1,  # Put in behind the system ground thruth
+            depthshade=True,  # keeps your glow alpha/color more faithful
+            linewidths=0,
+        )
 
     # Pane color
     ax_3d.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
@@ -334,11 +341,14 @@ def _setup_1d_axis_subplot(
                 - state_space[explorable_interval, selected_dimension]
             )
             noise_alpha_treshold = 1.0 * numpy_softplus(noise_alpha_treshold, beta=7.0)
-            noise_alpha_treshold = 0.75 * noise_alpha_treshold.clip(max=2.0)
+            noise_alpha_treshold = 1.0 * noise_alpha_treshold.clip(max=2.0)
             noise_alpha_treshold = noise_alpha_treshold.mean()
 
             # Visualize noise "blur/glow" layers
-            for each_ms, each_a in [(12, 0.09), (6, 0.2), (2, 0.65)]:
+            # noise_blur_cfg = [(12, 0.075), (6, 0.175), (2, 0.55)]
+            # noise_blur_cfg = [(10, 0.1), (6, 0.5), (2, 0.85)]
+            noise_blur_cfg = [(10, 0.1), (6, 0.5), (1.0, 0.25)]
+            for each_z, (each_ms, each_a) in enumerate(noise_blur_cfg):
                 each_ms *= (
                     COLOR_GROUND_TRUTH_NOISE_BLUR_MARKERSIZE * MARKERSIZE_OBSERVATIONS
                 )
@@ -348,10 +358,10 @@ def _setup_1d_axis_subplot(
                     time_space[explorable_interval],
                     state_space_with_noise[explorable_interval, selected_dimension].T,
                     ".",
-                    color=COLOR_GROUND_TRUTH_NOISE_BLUR,
+                    color=COLOR_GROUND_TRUTH_NOISE_BLUR[each_z],
                     alpha=each_a,
                     markersize=each_ms,
-                    zorder=3,  # Put in behind the system ground thruth
+                    zorder=each_z + 1,  # Put in behind the system ground thruth
                 )
 
         show_sample_label_once = ""
