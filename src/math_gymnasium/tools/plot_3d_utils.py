@@ -109,12 +109,12 @@ def three_dimension_environment_space_plot(
         )
     ).mean(axis=-1)
 
-    noise_dynamic_size = 2.5 * numpy_softplus(noise_dynamic_size, beta=1.0)
-    noise_dynamic_size = noise_dynamic_size.clip(max=4.0)
+    noise_dynamic_size = 2.5 * numpy_softplus(noise_dynamic_size, beta=0.75)
+    noise_dynamic_size = noise_dynamic_size.clip(max=4.0) * 0.75
 
     # Visualize noise "blur/glow" layers
     # three_d_noise_blur_cfg = [(6, 0.025), (3, 0.08), (1.5, 0.5)]
-    three_d_noise_blur_cfg = [(3.05, 0.075), (2.25, 0.25), (1.05, 0.66)]
+    three_d_noise_blur_cfg = [(4.05, 0.075), (2.5, 0.15), (1.0, 0.66)]
     for each_z, (each_ms, each_a) in enumerate(three_d_noise_blur_cfg):
         ax_3d.scatter3D(
             *state_space_3d_with_noise[subplot_1d_interval, :].T,
@@ -127,8 +127,9 @@ def three_dimension_environment_space_plot(
             color=COLOR_GROUND_TRUTH_NOISE_BLUR[each_z],
             alpha=COLOR_GROUND_TRUTH_NOISE_BLUR_ALPHA * each_a,
             zorder=each_z + 1,  # Put in behind the system ground thruth
-            depthshade=True,  # keeps your glow alpha/color more faithful
-            linewidths=0,
+            depthshade=False,  # keeps your glow alpha/color more faithful
+            # linewidths=1.0 * limits_ratio,
+            linewidths=0.0,
         )
 
     # Pane color
