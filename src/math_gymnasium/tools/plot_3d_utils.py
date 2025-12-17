@@ -86,6 +86,7 @@ def three_dimension_environment_space_plot(
         # *state_space_3d_with_noise[subplot_1d_interval, :].T,
         color=COLOR_GROUND_TRUTH,
         alpha=COLOR_LINE_3D_ALPHA,
+        # alpha=1.0,
         lw=THREE_DIM_LW,
         zorder=4,  # Put in front of predictions
     )
@@ -114,7 +115,7 @@ def three_dimension_environment_space_plot(
 
     # Visualize noise "blur/glow" layers
     # three_d_noise_blur_cfg = [(6, 0.025), (3, 0.08), (1.5, 0.5)]
-    three_d_noise_blur_cfg = [(6., 0.1), (3., 0.15), (1.0, 1.0)]
+    three_d_noise_blur_cfg = [(5.0, 0.05), (2.5, 0.175), (1.0, 1.0)]
     for each_z, (each_ms, each_a) in enumerate(three_d_noise_blur_cfg):
         ax_3d.scatter3D(
             *state_space_3d_with_noise[subplot_1d_interval, :].T,
@@ -440,7 +441,6 @@ def three_dimension_prediction_plot(
         color=COLOR_PREDICTIONS,
         alpha=COLOR_LINE_3D_ALPHA,
         lw=THREE_DIM_LW,
-        # zorder=2,  # Put behind the ground truth plot
         zorder=5,  # Put in front of the ground truth plot
     )
 
