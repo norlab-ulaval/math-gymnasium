@@ -652,26 +652,38 @@ def _setup_1d_axis_prediction_subplot(
 
 
 def plot_history_horizon_len(cfg: omegaconf.DictConfig, ax_z: plt.Axes) -> plt.Axes:
+    # Position on plot from top left corner
+    v_offset = 200
+    h_offset = 100
+
     granularity = cfg.environment.time_space.granularity
-    history_len = cfg.ms_model.history_len / granularity
-    horizon_len = cfg.ms_model.horizon_len / granularity
-    v_offset = 2
-    h_offset = 100 / granularity
+    history_len = cfg.ms_model.history_len
+    horizon_len = cfg.ms_model.horizon_len
+    bar_height = 50
+
+    x_plot_scale = 1 / granularity
+    y_plot_scale = 1 / (ax_z.get_ylim()[1] - ax_z.get_ylim()[0])
+
+    # Note: axis units are in 0:1
+    history_start = x_plot_scale * h_offset
+    history_end = history_start + x_plot_scale * history_len
     ax_z.axhspan(
-        ymax=ax_z.get_ylim()[1] - v_offset,
-        ymin=ax_z.get_ylim()[1] - v_offset - 1,
-        xmin=h_offset,
-        xmax=history_len + h_offset,
+        ymax=ax_z.get_ylim()[1] - y_plot_scale * v_offset,
+        ymin=ax_z.get_ylim()[1] - y_plot_scale * (v_offset - bar_height),
+        xmin=history_start,
+        xmax=history_end,
         # color="whitesmoke",
         # color="white",
         # color="gainsboro",
         color="dimgray",
     )
+    horizon_start = history_end
+    horizon_end = horizon_start + x_plot_scale * horizon_len
     ax_z.axhspan(
-        ymax=ax_z.get_ylim()[1] - v_offset,
-        ymin=ax_z.get_ylim()[1] - v_offset - 1,
-        xmin=history_len + h_offset,
-        xmax=history_len + horizon_len + h_offset,
+        ymax=ax_z.get_ylim()[1] - y_plot_scale * v_offset,
+        ymin=ax_z.get_ylim()[1] - y_plot_scale * (v_offset - bar_height),
+        xmin=horizon_start,
+        xmax=horizon_end,
         # color="silver",
         color="darkgray",
     )
