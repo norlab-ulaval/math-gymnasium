@@ -575,7 +575,7 @@ def _setup_1d_axis_prediction_subplot(
             alpha=COLOR_ALE_ALPHA,
             linewidth=0,
             antialiased=True,
-            zorder=1,  # Put behind EPI fills
+            zorder=2,  # Put behind EPI fills
             label=f"Aleatoric uncertainty ({ale_uncertainty_scaling}" + r"$\sigma$)",
         )
         axis.fill_between(
@@ -583,10 +583,10 @@ def _setup_1d_axis_prediction_subplot(
             epi_lower_bound,
             ale_lower_bound,
             color=COLOR_ALE,
-            linewidth=0,
             alpha=COLOR_ALE_ALPHA,
+            linewidth=0,
             antialiased=True,
-            zorder=1,  # Put behind EPI fills
+            zorder=2,  # Put behind EPI fills
         )
     elif show_ale_uncertainty and not show_epi_uncertainty:
         axis.fill_between(
@@ -597,7 +597,7 @@ def _setup_1d_axis_prediction_subplot(
             alpha=COLOR_ALE_ALPHA,
             linewidth=0,
             antialiased=True,
-            zorder=1,
+            zorder=2,
             label=f"Aleatoric uncertainty ({ale_uncertainty_scaling}" + r"$\sigma$)",
         )
 
