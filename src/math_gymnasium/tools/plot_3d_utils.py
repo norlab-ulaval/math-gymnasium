@@ -123,7 +123,8 @@ def three_dimension_environment_space_plot(
             s=THREE_DIM_LW
             * COLOR_GROUND_TRUTH_NOISE_BLUR_MARKERSIZE
             * noise_dynamic_size**2
-            * each_ms**2 * limits_ratio,
+            * each_ms**2
+            * limits_ratio,
             color=COLOR_GROUND_TRUTH_NOISE_BLUR[each_z],
             alpha=COLOR_GROUND_TRUTH_NOISE_BLUR_ALPHA * each_a,
             zorder=each_z + 1,  # Put in behind the system ground thruth
@@ -652,24 +653,25 @@ def _setup_1d_axis_prediction_subplot(
 
 
 def plot_history_horizon_len(cfg: omegaconf.DictConfig, ax_z: plt.Axes) -> plt.Axes:
-    # Position on plot from top left corner
-    v_offset = 200
-    h_offset = 100
 
     granularity = cfg.environment.time_space.granularity
     history_len = cfg.ms_model.history_len
     horizon_len = cfg.ms_model.horizon_len
-    bar_height = 50
 
     x_plot_scale = 1 / granularity
-    y_plot_scale = 1 / (ax_z.get_ylim()[1] - ax_z.get_ylim()[0])
+    y_upper_lim = ax_z.get_ylim()[1]
+
+    # Position on plot from top left corner
+    bar_height_top = 0.975
+    bar_height_bottom = 0.95
+    h_offset = 100
 
     # Note: axis units are in 0:1
     history_start = x_plot_scale * h_offset
     history_end = history_start + x_plot_scale * history_len
     ax_z.axhspan(
-        ymax=ax_z.get_ylim()[1] - y_plot_scale * v_offset,
-        ymin=ax_z.get_ylim()[1] - y_plot_scale * (v_offset - bar_height),
+        ymax=y_upper_lim * bar_height_top,
+        ymin=y_upper_lim * bar_height_bottom,
         xmin=history_start,
         xmax=history_end,
         # color="whitesmoke",
@@ -680,8 +682,8 @@ def plot_history_horizon_len(cfg: omegaconf.DictConfig, ax_z: plt.Axes) -> plt.A
     horizon_start = history_end
     horizon_end = horizon_start + x_plot_scale * horizon_len
     ax_z.axhspan(
-        ymax=ax_z.get_ylim()[1] - y_plot_scale * v_offset,
-        ymin=ax_z.get_ylim()[1] - y_plot_scale * (v_offset - bar_height),
+        ymax=y_upper_lim * bar_height_top,
+        ymin=y_upper_lim * bar_height_bottom,
         xmin=horizon_start,
         xmax=horizon_end,
         # color="silver",
