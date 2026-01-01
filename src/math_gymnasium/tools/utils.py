@@ -34,6 +34,7 @@ def math_continuous_gymnasium_env_to_test_motion_trajectory_dataclass(
         observations=trj.state_axes.obs_with_noise,
         actions=trj.time_axis.obs_with_noise,
         pose=trj.state_axes.poses_with_noise,
+        pose_gt=trj.state_axes.poses,
     )
 
 
