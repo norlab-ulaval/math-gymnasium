@@ -407,6 +407,7 @@ def three_dimension_prediction_plot(
     ale_uncertainty_scaling: float = ALE_UNCERTAINTY_SCALING_DEFAULT,
     show_epi_uncertainty: bool = True,
     epi_uncertainty_scaling: float = EPI_UNCERTAINTY_SCALING_DEFAULT,
+    show_explorable_space=True,
     subplot_1d_interval: Optional[slice] = None,
     figsize: tuple = (20, 8),
     figdpi: int = 50,
@@ -431,6 +432,7 @@ def three_dimension_prediction_plot(
         show_samples=False,
         figsize=figsize,
         figdpi=figdpi,
+        show_explorable_space=show_explorable_space,
         extra_info_str=extra_info_str,
         experiment_id=experiment_id,
     )
