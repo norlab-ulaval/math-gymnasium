@@ -23,6 +23,9 @@ from .non_linear_system.simple_limit_cycle_system_van_der_pol import (
 from .non_linear_system.wavy_projection_system import (
     rollout_wavy_projection_partial_derivative,
 )
+from .non_linear_system.sombrero_projection_system import (
+    rollout_sombrero_projection_partial_derivative,
+)
 from .linear_debug_system import rollout_linear_debug_system
 
 __all__ = [
@@ -36,5 +39,6 @@ __all__ = [
     "rollout_damped_oscillator_partial_derivative",
     "rollout_simple_limit_cycle_partial_derivative",
     "rollout_wavy_projection_partial_derivative",
+    "rollout_sombrero_projection_partial_derivative",
     "rollout_linear_debug_system",
 ]
