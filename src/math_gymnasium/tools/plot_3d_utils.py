@@ -10,6 +10,7 @@ from matplotlib import pyplot as plt
 from math_gymnasium.tools.style import *
 from math_gymnasium.tools.utils import agreement_score_relative_exp
 from tools.dna_dev_tools.dn_pytest_tools import is_pytest_run
+from tools.hydra_apps_tools.omegaconf_utils import is_cfg_key_exist
 from tools.math_tools.math_fct import numpy_softplus
 from tools.plot_tools.style import AXIS_LABEL_STYLE
 
@@ -242,12 +243,20 @@ def three_dimension_environment_space_plot(
         else:
             obs_str += "timestep"
 
+        granularity_str = ""
+        if is_cfg_key_exist(cfg, "environment.time_space.granularity"):
+            granularity_str = f"  Time space granularity: {cfg.environment.time_space.granularity}\n"
+
+        explorable_space_str = ""
+        if is_cfg_key_exist(cfg, "environment.explorable_space"):
+            explorable_space_str = f"  Explorable space idx: {cfg.environment.explorable_space}\n"
+
         info_str = (
             # f"Environment math function:\n"
             # f"  {state_space_label}\n"
             f"{state_space_label}\n"
-            f"  Time space granularity: {cfg.environment.time_space.granularity}\n"
-            f"  Explorable space idx: {cfg.environment.explorable_space}\n"
+            f"{granularity_str}"
+            f"{explorable_space_str}"
             f"  Observations: ({obs_str})\n"
             f"{extra_info_str or ''}"
         )
