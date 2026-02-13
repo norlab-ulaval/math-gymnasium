@@ -245,11 +245,15 @@ def three_dimension_environment_space_plot(
 
         granularity_str = ""
         if is_cfg_key_exist(cfg, "environment.time_space.granularity"):
-            granularity_str = f"  Time space granularity: {cfg.environment.time_space.granularity}\n"
+            granularity_str = (
+                f"  Time space granularity: {cfg.environment.time_space.granularity}\n"
+            )
 
         explorable_space_str = ""
         if is_cfg_key_exist(cfg, "environment.explorable_space"):
-            explorable_space_str = f"  Explorable space idx: {cfg.environment.explorable_space}\n"
+            explorable_space_str = (
+                f"  Explorable space idx: {cfg.environment.explorable_space}\n"
+            )
 
         info_str = (
             # f"Environment math function:\n"
@@ -279,7 +283,11 @@ def three_dimension_environment_space_plot(
             **text_style,
         )
 
-    plot_history_horizon_len(cfg, ax_z)
+    plot_history_horizon_len(
+        cfg,
+        len(time_space),
+        ax_z,
+    )
 
     return fig, ax_3d, ax_z, ax_x, ax_y
 
@@ -663,13 +671,14 @@ def _setup_1d_axis_prediction_subplot(
     return axis
 
 
-def plot_history_horizon_len(cfg: omegaconf.DictConfig, ax_z: plt.Axes) -> plt.Axes:
+def plot_history_horizon_len(
+    cfg: omegaconf.DictConfig, trj_steps_len: int, ax_z: plt.Axes
+) -> plt.Axes:
 
-    granularity = cfg.environment.time_space.granularity
     history_len = cfg.ms_model.history_len
     horizon_len = cfg.ms_model.horizon_len
 
-    x_plot_scale = 1 / granularity
+    x_plot_scale = 1 / trj_steps_len
     y_upper_lim = ax_z.get_ylim()[1]
 
     # Position on plot from top left corner

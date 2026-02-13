@@ -29,13 +29,17 @@ def math_continuous_gymnasium_env_to_test_motion_trajectory_dataclass(
             f"`MathContinuousGymnasium` but `{type(test_env)}` was given."
         )
 
-    return TestMotionTrajectoryDataclass(
+    motion_container = TestMotionTrajectoryDataclass(
         feature_name=f"{trj.feature_name} test trajectory",
+        pose=trj.state_axes.poses_with_noise,
         observations=trj.state_axes.obs_with_noise,
         actions=trj.time_axis.obs_with_noise,
-        pose=trj.state_axes.poses_with_noise,
+        timestamps=trj.time_axis.wall,
         pose_gt=trj.state_axes.poses,
     )
+
+    test_env.close()
+    return motion_container
 
 
 def agreement_score_relative_exp(
