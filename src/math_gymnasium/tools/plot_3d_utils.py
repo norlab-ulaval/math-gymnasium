@@ -233,15 +233,17 @@ def three_dimension_environment_space_plot(
 
     if not is_pytest_run():
 
-        if cfg.environment.obs_are_dt_derivatives:
-            obs_str = "velocity, "
-        else:
-            obs_str = "pose, "
+        obs_str = ""
+        if is_cfg_key_exist(cfg, "environment.obs_are_dt_derivatives"):
+            if cfg.environment.obs_are_dt_derivatives:
+                obs_str += "velocity, "
+            else:
+                obs_str += "pose, "
 
-        if cfg.environment.obs_time_is_delta_time:
-            obs_str += "delta-time"
-        else:
-            obs_str += "timestep"
+            if cfg.environment.obs_time_is_delta_time:
+                obs_str += "delta-time"
+            else:
+                obs_str += "timestep"
 
         granularity_str = ""
         if is_cfg_key_exist(cfg, "environment.time_space.granularity"):
