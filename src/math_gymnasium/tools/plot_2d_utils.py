@@ -8,9 +8,14 @@ import torch
 from math_gymnasium.tools.style import *
 from matplotlib import pyplot as plt
 
+from tools.hydra_apps_tools.omegaconf_utils import is_cfg_key_exist
+
 
 def prep_two_dimension_observation_prediction_output_for_plotting(
-    y_pred: torch.Tensor, y_pred_logvar: torch.Tensor, obs_shape: tuple, ensemble_size: int
+    y_pred: torch.Tensor,
+    y_pred_logvar: torch.Tensor,
+    obs_shape: tuple,
+    ensemble_size: int,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """
     Prepares prediction output tensors for plotting by adjusting their dimensions as needed.
@@ -43,21 +48,29 @@ def two_dimension_environment_space_plot(
     show_samples: bool = True,
     figsize: tuple = (20, 8),
 ) -> Tuple[plt.Figure, plt.Axes]:
-    fig, ax = plt.subplots(1, 1, figsize=figsize, dpi=50) # default dpi=100
+    fig, ax = plt.subplots(1, 1, figsize=figsize, dpi=50)  # default dpi=100
 
-    ax.plot(state_space_x,
-            state_space_y,
-            color=COLOR_GROUND_TRUTH,
-            alpha=COLOR_GROUND_TRUTH_ALPHA,
-            ls="--",
-            linewidth=2,
-            label=state_space_label)
+    ax.plot(
+        state_space_x,
+        state_space_y,
+        color=COLOR_GROUND_TRUTH,
+        alpha=COLOR_GROUND_TRUTH_ALPHA,
+        ls="--",
+        linewidth=2,
+        label=state_space_label,
+    )
 
     # ax.plot(state_space_x, target_state_space_y, '.', color='r', markersize=1.9, alpha=0.25,
     # label=state_space_label_)
     show_explorable_label_once = "Explorable region of the state space"
     show_sample_label_once = "Sample's"
-    for each_explorable_interval_ in [*cfg.environment.explorable_space]:
+
+    if is_cfg_key_exist(cfg, "environment.explorable_space"):
+        explorable_space_interval = [*cfg.environment.explorable_space]
+    else:
+        explorable_space_interval = [[0, len(state_space_x)]]
+
+    for each_explorable_interval_ in explorable_space_interval:
         interval_ = slice(each_explorable_interval_[0], each_explorable_interval_[1])
         if show_samples:
             ax.plot(
@@ -128,11 +141,15 @@ def two_dimension_prediction_plot(
     )
 
     # .... Predictions ............................................................................
-    ax.plot(state_space_x, y_pred, ".",
-            color=COLOR_PREDICTIONS,
-            markersize=MARKERSIZE_PREDICTIONS,
-            alpha=COLOR_PREDICTIONS_ALPHA,
-            label="Prediction")
+    ax.plot(
+        state_space_x,
+        y_pred,
+        ".",
+        color=COLOR_PREDICTIONS,
+        markersize=MARKERSIZE_PREDICTIONS,
+        alpha=COLOR_PREDICTIONS_ALPHA,
+        label="Prediction",
+    )
 
     # .... Aleatoric uncertainty standard deviation ...............................................
     ax.fill_between(
@@ -144,10 +161,13 @@ def two_dimension_prediction_plot(
         label="Uncertainty (ale + epi)",
     )
 
-    ax.fill_between(state_space_x, y_pred - 2 * y_std, y_pred,
-                    color=COLOR_ALE,
-                    alpha=COLOR_ALE_ALPHA
-                    )
+    ax.fill_between(
+        state_space_x,
+        y_pred - 2 * y_std,
+        y_pred,
+        color=COLOR_ALE,
+        alpha=COLOR_ALE_ALPHA,
+    )
 
     # .... Epistemic uncertainty standard deviation ...............................................
     # (Priority) ToDo: implement EPI fill between.

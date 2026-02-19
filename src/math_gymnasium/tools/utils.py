@@ -36,6 +36,8 @@ def math_continuous_gymnasium_env_to_test_motion_trajectory_dataclass(
         actions=trj.time_axis.obs_with_noise,
         timestamps=trj.time_axis.wall,
         pose_gt=trj.state_axes.poses,
+        obs_are_velocity=trj.obs_are_velocity,
+        velocity_frame="world"
     )
 
     test_env.close()

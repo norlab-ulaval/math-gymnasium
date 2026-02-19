@@ -326,7 +326,12 @@ def _setup_1d_axis_subplot(
             show_explorable_label_once = "Explorable region of the state space"
         show_sample_label_once = "Sample's"
 
-    for each_cfg in [*cfg.environment.explorable_space]:
+    if is_cfg_key_exist(cfg, "environment.explorable_space"):
+        explorable_space_interval = [*cfg.environment.explorable_space]
+    else:
+        explorable_space_interval = [[0, len(time_space)]]
+
+    for each_cfg in explorable_space_interval:
         explorable_interval = slice(each_cfg[0], each_cfg[1])
 
         if show_samples:
@@ -434,7 +439,7 @@ def three_dimension_prediction_plot(
     omegaconf.OmegaConf.set_readonly(cfg, True)
 
     if not subplot_1d_interval:
-        subplot_1d_interval = slice(0, time_space.size - 1)
+        subplot_1d_interval = slice(0, len(time_space) - 1)
     else:
         assert isinstance(subplot_1d_interval, slice)
 

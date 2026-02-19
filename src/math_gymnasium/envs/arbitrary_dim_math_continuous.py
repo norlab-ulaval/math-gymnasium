@@ -202,6 +202,7 @@ class MathContinuousGymnasium(gym.Env):
                 delta=delta_time_axis,
                 obs=time_axis_obs,
             ),
+            obs_are_velocity=self._observed_state_are_dt_derivatives
         )
 
         self._validate_and_register_measurement_noise(measurement_noise_cfg)
