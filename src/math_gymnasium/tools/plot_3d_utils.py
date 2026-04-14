@@ -128,7 +128,7 @@ def three_dimension_environment_space_plot(
             * limits_ratio,
             color=COLOR_GROUND_TRUTH_NOISE_BLUR[each_z],
             alpha=COLOR_GROUND_TRUTH_NOISE_BLUR_ALPHA * each_a,
-            zorder=each_z + 1,  # Put in behind the system ground thruth
+            zorder=each_z + 1,  # Put in behind the system ground truth
             depthshade=True,  # keeps your glow alpha/color more faithful
             linewidths=0.0,
         )
@@ -386,7 +386,7 @@ def _setup_1d_axis_subplot(
                     color=COLOR_GROUND_TRUTH_NOISE_BLUR[each_z],
                     alpha=each_a,
                     markersize=each_ms,
-                    zorder=each_z + 1,  # Put in behind the system ground thruth
+                    zorder=each_z + 1,  # Put in behind the system ground truth
                 )
 
         show_sample_label_once = ""
