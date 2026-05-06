@@ -60,6 +60,8 @@ def three_dimension_environment_space_plot(
     state_space_label: str,
     subplot_1d_interval: Optional[slice] = None,
     show_samples: bool = True,
+    show_3d_grid=True,
+    show_3d_axes=True,
     figsize: tuple = (20, 16),
     figdpi: int = 50,
     show_explorable_space=True,
@@ -90,6 +92,7 @@ def three_dimension_environment_space_plot(
         # alpha=1.0,
         lw=THREE_DIM_LW,
         zorder=4,  # Put in front of predictions
+        axlim_clip=True,
     )
 
     # Quick-hack to prevent 3D aspect ratio skewing
@@ -228,6 +231,12 @@ def three_dimension_environment_space_plot(
         numpoints=3,
         markerscale=11.0,
     )
+
+    if not show_3d_grid:
+        ax_3d.grid(visible=False)
+
+    if not show_3d_axes:
+        ax_3d.set_axis_off()
 
     # .... Show experiment relevant information ...................................................
 
@@ -397,8 +406,8 @@ def _setup_1d_axis_subplot(
                 xmax=time_space[explorable_interval.stop - 1],
                 linestyle="-",
                 linewidth=1,
-                color="gray",
-                alpha=0.12,
+                color="lightgray",
+                alpha=0.25,
                 label=show_explorable_label_once,
             )
             show_explorable_label_once = ""
@@ -454,6 +463,8 @@ def three_dimension_prediction_plot(
         state_space_label=state_space_label,
         subplot_1d_interval=subplot_1d_interval,
         show_samples=False,
+        show_3d_grid=cfg.pipeline.plot.get("show_3d_grid", True),
+        show_3d_axes=cfg.pipeline.plot.get("show_3d_axes", True),
         figsize=figsize,
         figdpi=figdpi,
         show_explorable_space=show_explorable_space,
