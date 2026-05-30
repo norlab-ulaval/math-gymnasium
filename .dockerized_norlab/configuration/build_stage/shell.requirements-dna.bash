@@ -27,7 +27,7 @@ python3 -m pip install --upgrade pip
 } || n2st::print_msg_error_and_exit "Failed apt-get package install!"
 
 # ....Example 3: Host specific logic...............................................................
-if [[ $( n2st::which_architecture_and_os ) == "l4t\arm64" ]]; then
+if [[ $( n2st::which_architecture_and_os ) == "l4t/arm64" ]]; then
   n2st::print_msg "Is running on a Jetson..."
   # Add Jetson logic e.g., cat /proc/device-tree/model
 fi
