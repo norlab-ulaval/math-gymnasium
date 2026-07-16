@@ -565,6 +565,7 @@ def _setup_1d_axis_prediction_subplot(
     ale_uncertainty_scaling: float = ALE_UNCERTAINTY_SCALING_DEFAULT,
     show_epi_uncertainty: bool = True,
     epi_uncertainty_scaling: float = EPI_UNCERTAINTY_SCALING_DEFAULT,
+    observations_fmt: str = ".",
 ) -> plt.Axes:
 
     state_space_3d_target = state_space_3d_target[..., selected_dimension]
@@ -583,7 +584,7 @@ def _setup_1d_axis_prediction_subplot(
     axis.plot(
         time_space,
         state_space_3d_target,
-        ".",
+        observations_fmt,
         color=COLOR_OBSERVATIONS,
         markersize=MARKERSIZE_OBSERVATIONS,
         alpha=COLOR_OBSERVATIONS_ALPHA,
