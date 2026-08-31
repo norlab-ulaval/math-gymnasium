@@ -11,7 +11,7 @@ Mathematic function formulated as a Gymnasium environment. This is a no action e
 ## Repository Guidelines Instructions
 
 1. First, review and learn _A2G Framework Guidelines_ specified in
-   `.junie/ai_agent_guidelines/guidelines.a2g_framework.md`.
+   `.junie/ai_agent_guidelines/framework/guidelines.a2g_framework.md`.
 2. Then review the remaining repository guidelines below.
 3. **AI agents must follow the mandatory compliance requirements specified below.**
 
