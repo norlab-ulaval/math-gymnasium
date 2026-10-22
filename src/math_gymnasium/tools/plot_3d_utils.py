@@ -1,5 +1,6 @@
 # coding=utf-8
-from typing import Optional, Tuple
+import functools
+from typing import Callable, Optional, Tuple
 
 import numpy as np
 import omegaconf
@@ -18,6 +19,23 @@ DIM_X = 0
 DIM_Y = 1
 DIM_Z = 2
 LEGEND_BBOX_TO_ANCHOR = (1.0, 0.99)
+
+
+def _cfg_readonly_scope(func: Callable) -> Callable:
+    """
+    Make ``cfg`` read-only for the duration of the decorated plotting function only.
+
+    The caller's ``cfg`` read-only flag is restored on exit (including on exception), so plotting
+    never leaks a permanent read-only state to downstream code that legitimately writes to ``cfg``
+    (e.g., the RLRP-839 resume driver rebuilding a model/trainer for each candidate).
+    """
+
+    @functools.wraps(func)
+    def wrapper(cfg: omegaconf.DictConfig, *args, **kwargs):
+        with omegaconf.flag_override(cfg, "readonly", True):
+            return func(cfg, *args, **kwargs)
+
+    return wrapper
 
 
 def prep_arbitrary_dimension_observation_prediction_output_for_1D_plotting(
@@ -51,6 +69,7 @@ def prep_arbitrary_dimension_observation_prediction_output_for_1D_plotting(
     return pred_sdim, pred_logvar_sdim
 
 
+@_cfg_readonly_scope
 def three_dimension_environment_space_plot(
     cfg: omegaconf.DictConfig,
     time_space: np.ndarray,
@@ -68,8 +87,6 @@ def three_dimension_environment_space_plot(
     extra_info_str: str = None,
     experiment_id: Optional[str] = None,
 ) -> Tuple[plt.Figure, plt.Axes, plt.Axes, plt.Axes, plt.Axes]:
-    omegaconf.OmegaConf.set_readonly(cfg, True)
-
     if subplot_1d_interval is None:
         subplot_1d_interval = slice(0, time_space.size - 1)
     else:
@@ -426,6 +443,7 @@ def _setup_1d_axis_subplot(
     return axis
 
 
+@_cfg_readonly_scope
 def three_dimension_prediction_plot(
     cfg: omegaconf.DictConfig,
     time_space: np.ndarray,
@@ -447,8 +465,6 @@ def three_dimension_prediction_plot(
     extra_info_str: Optional[str] = None,
     experiment_id: Optional[str] = None,
 ) -> Tuple[plt.Figure, plt.Axes, plt.Axes, plt.Axes, plt.Axes]:
-    omegaconf.OmegaConf.set_readonly(cfg, True)
-
     if not subplot_1d_interval:
         subplot_1d_interval = slice(0, len(time_space) - 1)
     else:
